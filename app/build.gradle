@@ -1,0 +1,84 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    compileSdkVersion project.compileSdk
+
+    defaultConfig {
+        applicationId "com.leelu.shadow"
+        minSdkVersion project.minSdk
+        targetSdkVersion project.targetSdk
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    //启用ViewBinding
+    viewBinding {
+        enabled = true
+    }
+
+    sourceSets {
+        debug {
+            assets.srcDir('build/generated/assets/plugin-manager/debug/')
+            assets.srcDir('build/generated/assets/plugin-zip/debug/')
+        }
+        release {
+            assets.srcDir('build/generated/assets/plugin-manager/release/')
+            assets.srcDir('build/generated/assets/plugin-zip/release/')
+        }
+    }
+}
+
+dependencies {
+    implementation(fileTree("libs"))
+    implementation project(path: ':constants')
+    implementation project(':app-lib')
+
+
+    implementation "androidx.core:core-ktx:$core_version"
+    implementation "androidx.appcompat:appcompat:$appcompat_version"
+    implementation "com.google.android.material:material:$material_version"
+    implementation "androidx.annotation:annotation:$annotation_version"
+    implementation "androidx.constraintlayout:constraintlayout:$constraint_version"
+
+    // ViewModel
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+
+    // LiveData
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
+    // alternately - if using Java8, use the following instead of lifecycle-compiler
+    implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+
+
+    implementation 'com.blankj:utilcodex:1.31.0'
+
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
+
+
+    implementation "com.tencent.shadow.dynamic:manager:$shadow_version"
+    implementation "commons-io:commons-io:$commons_version"
+    implementation "com.tencent.shadow.dynamic:host:$shadow_version"
+    implementation "com.tencent.shadow.core:common:$shadow_version"
+    implementation "org.slf4j:slf4j-api:1.7.30"
+
+
+}

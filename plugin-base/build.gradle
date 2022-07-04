@@ -1,0 +1,117 @@
+plugins {
+    id 'com.android.application'
+    id 'com.tencent.shadow.plugin'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    compileSdkVersion project.compileSdk
+
+
+    defaultConfig {
+        applicationId "com.leelu.shadow.plugin_base"
+        minSdkVersion project.minSdk
+        targetSdkVersion project.targetSdk
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    //    flavorDimensions(*flavorDimensionList, 'type')
+    // 将插件applicationId设置为和宿主相同
+    productFlavors {
+        plugin {
+            applicationId "com.leelu.shadow"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+
+    lintOptions {
+        abortOnError false
+    }
+
+    aaptOptions {
+        additionalParameters "--package-id", "0x7E", "--allow-reserved-package-id"
+    }
+}
+
+dependencies {
+    pluginCompileOnly "com.tencent.shadow.core:runtime:$shadow_version"
+    implementation "androidx.core:core-ktx:$core_version"
+    implementation "androidx.appcompat:appcompat:$appcompat_version"
+    implementation "com.google.android.material:material:$material_version"
+    implementation "androidx.constraintlayout:constraintlayout:$constraint_version"
+
+
+    pluginCompileOnly project(":app-lib")
+    normalImplementation project(":app-lib")
+
+    implementation project(":ablum-lib")
+
+}
+
+
+shadow {
+    transform {
+//        useHostContext = ['abc']
+    }
+
+    packagePlugin {
+        pluginTypes {
+            debug {
+                pluginApks {
+//                    loaderApkConfig = new Tuple2('plugin-loader-debug.apk', ':plugin-loader:assembleDebug')
+//                    runtimeApkConfig = new Tuple2('plugin-runtime-debug.apk', ':plugin-runtime:assembleDebug')
+                    pluginApk1 {
+                        businessName = ''
+                        partKey = 'pluginBase'
+                        buildTask = ':plugin-base:assemblePluginDebug'
+                        apkPath = 'plugin-base/build/outputs/apk/plugin/debug/plugin-base-plugin-debug.apk'
+                        hostWhiteList = ["com.leelu.shadow.app_lib"]
+                    }
+                }
+            }
+
+            release {
+//                loaderApkConfig = new Tuple2('plugin-loader-release.apk', ':plugin-loader:assembleRelease')
+//                runtimeApkConfig = new Tuple2('plugin-runtime-release.apk', ':plugin-runtime:assembleRelease')
+                pluginApks {
+                    pluginApk1 {
+                        businessName = ''
+                        partKey = 'pluginBase'
+                        buildTask = ':plugin-base:assemblePluginRelease'
+                        apkPath = 'plugin-base/build/outputs/apk/plugin/release/plugin-base-plugin-release-unsigned.apk'
+                        hostWhiteList = ["com.leelu.shadow.app_lib"]
+                    }
+                }
+            }
+        }
+//        loaderApkProjectPath = 'plugin-loader'
+//        runtimeApkProjectPath = 'plugin-runtime'
+
+        uuid = project.uuid
+        archiveSuffix = System.getenv("PluginSuffix") ?: ""
+        archivePrefix = 'plugin-base'
+        destinationDir = "${getRootProject().getBuildDir()}"
+
+        version = 4
+        compactVersion = [1, 2, 3]
+        uuidNickName = "1.1.5"
+    }
+}

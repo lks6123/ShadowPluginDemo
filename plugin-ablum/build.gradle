@@ -1,0 +1,116 @@
+plugins {
+    id 'com.android.application'
+    id 'com.tencent.shadow.plugin'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    compileSdkVersion project.compileSdk
+
+    defaultConfig {
+        applicationId "com.leelu.plugin_ablum"
+        minSdkVersion project.minSdk
+        targetSdkVersion project.targetSdk
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        ndk {
+            // 设置支持的SO库架构（开发者可以根据需要，选择一个或多个平台的so）
+            abiFilters "armeabi", "armeabi-v7a", "arm64-v8a"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    flavorDimensions(*flavorDimensionList, 'type')
+    // 将插件applicationId设置为和宿主相同
+    productFlavors {
+        plg {
+            applicationId "com.leelu.shadow"
+            dimension "type"
+        }
+        app {
+            dimension "type"
+        }
+    }
+
+    aaptOptions {
+        additionalParameters "--package-id", "0x7E", "--allow-reserved-package-id"
+    }
+}
+
+dependencies {
+    pluginCompileOnly "com.tencent.shadow.core:runtime:$shadow_version"
+
+    implementation "androidx.core:core-ktx:$core_version"
+    implementation "androidx.appcompat:appcompat:$appcompat_version"
+    implementation "com.google.android.material:material:$material_version"
+    implementation "androidx.constraintlayout:constraintlayout:$constraint_version"
+
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+
+    pluginCompileOnly project(":app-lib")
+    normalImplementation project(":app-lib")
+
+    pluginCompileOnly project(":ablum-lib")
+    normalImplementation project(":ablum-lib")
+
+}
+
+shadow {
+    transform {
+//        useHostContext = ['abc']
+    }
+
+    packagePlugin {
+        pluginTypes {
+            debug {
+                pluginApks {
+                    pluginApk1 {
+                        businessName = ''
+                        partKey = 'pluginAblum'
+                        buildTask = ':plugin-ablum:assemblePluginPlgDebug'
+                        apkPath = 'plugin-ablum/build/outputs/apk/pluginPlg/debug/plugin-ablum-plugin-plg-debug.apk'
+                        hostWhiteList = ["com.leelu.shadow.app_lib"
+                                         ,"com.leelu.shadow.ablum_lib"]
+                    }
+                }
+            }
+
+            release {
+                pluginApks {
+                    pluginApk1 {
+                        businessName = ''
+                        partKey = 'pluginAblum'
+                        buildTask = ':plugin-ablum:assemblePluginPlgRelease'
+                        apkPath = 'plugin-ablum/build/outputs/apk/pluginPlg/release/plugin-ablum-plugin-plg-release-unsigned.apk'
+                        hostWhiteList = ["com.leelu.shadow.app_lib"
+                                         ,"com.leelu.shadow.ablum_lib"]
+                    }
+                }
+            }
+        }
+
+        uuid = project.uuid
+        archiveSuffix = System.getenv("PluginSuffix") ?: ""
+        archivePrefix = 'plugin-ablum'
+        destinationDir = "${getRootProject().getBuildDir()}"
+
+        version = 4
+        compactVersion = [1, 2, 3]
+        uuidNickName = "1.1.5"
+    }
+}

@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">plugin-app</string>
+    <string name="main_default_content">Hello Shadow plugin_app plugin1</string>
+</resources>
